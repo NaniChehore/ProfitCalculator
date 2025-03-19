@@ -1,31 +1,12 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Airbnb Pricing Calculator</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profit Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <h1>Calculate Your Minimum Nightly Rate</h1>
-    <form method="POST">
-        <label>Fixed Costs (comma separated):</label>
-        <input type="text" name="fixed_costs"><br><br>
-        
-        <label>Variable Costs (comma separated):</label>
-        <input type="text" name="variable_costs"><br><br>
-        
-        <label>Expected Occupancy Rate (%):</label>
-        <input type="text" name="occupancy_rate"><br><br>
-        
-        <label>Desired Profit Margin (%):</label>
-        <input type="text" name="profit_margin"><br><br>
-        
-        <button type="submit">Calculate</button>
-    </form>
-    
-    {% if airbnb_price %}
-        <h2>Results:</h2>
-        <p>Airbnb Minimum Rate: R{{ airbnb_price|round(2) }}</p>
-        <p>Booking.com Minimum Rate: R{{ booking_price|round(2) }}</p>
-        <p>Combined Minimum Rate: R{{ combined_price|round(2) }}</p>
-    {% endif %}
-</body>
-</html>
+<body class="bg-gray-100">
+    <div class="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-10">
+        <h1 class="text-2xl font-bold text-center text-blue-600">Airbnb & Booking Profit Calculator</h1>
+        <p class="text-gray

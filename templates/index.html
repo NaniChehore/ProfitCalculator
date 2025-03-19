@@ -3,96 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profit Calculator</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Rental Profit Calculator</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; padding: 20px; background-color: #f4f4f4; }
+        h1 { text-align: center; }
+        form { background: white; padding: 20px; border-radius: 8px; max-width: 500px; margin: auto; box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); }
+        label { font-weight: bold; display: block; margin-top: 10px; }
+        input, button { width: 100%; padding: 10px; margin-top: 5px; border-radius: 5px; border: 1px solid #ccc; }
+        button { background-color: #007bff; color: white; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+        #result { text-align: center; font-size: 18px; margin-top: 20px; }
+    </style>
 </head>
-<body class="bg-gray-100">
-    <div class="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-10">
-        <h1 class="text-2xl font-bold text-center text-blue-600">Airbnb & Booking Profit Calculator</h1>
-        <p class="text-gray-600 text-center mt-2">Calculate your minimum nightly rate for profitability.</p>
+<body>
 
-        <form id="profit-form" class="mt-6">
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-gray-700">Purchase Amount (ZAR):</label>
-                    <input type="number" id="purchaseAmount" class="w-full p-2 border rounded" required>
-                </div>
+    <h1>Rental Profit Calculator</h1>
 
-                <div>
-                    <label class="block text-gray-700">Furnishing Costs (ZAR):</label>
-                    <input type="number" id="furnishingCost" class="w-full p-2 border rounded">
-                </div>
+    <form id="calculationForm">
+        <label for="purchaseAmount">Property Purchase Price (ZAR):</label>
+        <input type="number" id="purchaseAmount" name="purchaseAmount" required>
 
-                <div>
-                    <label class="block text-gray-700">Levies & Rates (ZAR):</label>
-                    <input type="number" id="leviesRates" class="w-full p-2 border rounded" required>
-                </div>
+        <label for="furnishingCost">Furnishing Costs (ZAR, if any):</label>
+        <input type="number" id="furnishingCost" name="furnishingCost">
 
-                <div>
-                    <label class="block text-gray-700">Internet Cost (ZAR):</label>
-                    <input type="number" id="internetCost" class="w-full p-2 border rounded" required>
-                </div>
+        <label for="leviesRates">Monthly Levies & Rates (ZAR):</label>
+        <input type="number" id="leviesRates" name="leviesRates">
 
-                <div>
-                    <label class="block text-gray-700">Electricity Cost (ZAR):</label>
-                    <input type="number" id="electricityCost" class="w-full p-2 border rounded" required>
-                </div>
+        <label for="internetCost">Monthly Internet Cost (ZAR):</label>
+        <input type="number" id="internetCost" name="internetCost">
 
-                <div>
-                    <label class="block text-gray-700">Other Fees (ZAR):</label>
-                    <input type="number" id="otherFees" class="w-full p-2 border rounded">
-                </div>
+        <label for="electricityCost">Average Prepaid Electricity Cost (ZAR):</label>
+        <input type="number" id="electricityCost" name="electricityCost">
 
-                <div>
-                    <label class="block text-gray-700">Cleaning Fees (ZAR):</label>
-                    <input type="number" id="cleaningFees" class="w-full p-2 border rounded" required>
-                </div>
+        <label for="otherFees">Other Building/Owner Fees (ZAR):</label>
+        <input type="number" id="otherFees" name="otherFees">
 
-                <div>
-                    <label class="block text-gray-700">Consumables Cost (ZAR):</label>
-                    <input type="number" id="consumablesCost" class="w-full p-2 border rounded">
-                </div>
+        <label for="cleaningFees">Monthly Cleaning Fees (ZAR):</label>
+        <input type="number" id="cleaningFees" name="cleaningFees">
 
-                <div>
-                    <label class="block text-gray-700">Average Occupancy (Days per Month):</label>
-                    <input type="number" id="occupancy" class="w-full p-2 border rounded" required>
-                </div>
-            </div>
+        <label for="consumables">Monthly Consumable Costs (Toiletries, Cleaning Supplies, etc.) (ZAR):</label>
+        <input type="number" id="consumables" name="consumables">
 
-            <button type="button" onclick="calculateProfit()"
-                class="w-full mt-6 bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
-                Calculate
-            </button>
-        </form>
+        <label for="occupancyRate">Average Monthly Occupancy (Days Booked Per Month):</label>
+        <input type="number" id="occupancyRate" name="occupancyRate">
 
-        <div id="results" class="mt-6 hidden p-4 bg-green-100 rounded">
-            <h2 class="text-xl font-semibold text-green-700">Results</h2>
-            <p id="bondPayment" class="text-gray-700 mt-2"></p>
-            <p id="minNightsBreakEven" class="text-gray-700 mt-1"></p>
-            <p id="minNightsProfit" class="text-gray-700 mt-1"></p>
-        </div>
-    </div>
+        <button type="button" id="calculateBtn">Calculate</button>
+    </form>
+
+    <div id="result"></div>
 
     <script>
-        function calculateProfit() {
-            let purchaseAmount = parseFloat(document.getElementById("purchaseAmount").value) || 0;
-            let furnishingCost = parseFloat(document.getElementById("furnishingCost").value) || 0;
-            let leviesRates = parseFloat(document.getElementById("leviesRates").value) || 0;
-            let internetCost = parseFloat(document.getElementById("internetCost").value) || 0;
-            let electricityCost = parseFloat(document.getElementById("electricityCost").value) || 0;
-            let otherFees = parseFloat(document.getElementById("otherFees").value)
-<script>
-document.getElementById("calculateBtn").addEventListener("click", function() {
-    let formData = new FormData(document.getElementById("calculationForm"));
+        document.getElementById("calculateBtn").addEventListener("click", function() {
+            let formData = new FormData(document.getElementById("calculationForm"));
 
-    fetch("/calculate", {
-        method: "POST",
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        document.getElementById("result").innerHTML = "Minimum nightly rate: R" + data.min_rate;
-    })
-    .catch(error => console.error("Error:", error));
-});
-</script>
+            fetch("/calculate", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("result").innerHTML = `
+                    <p><strong>Minimum Nightly Rate:</strong> R${data.min_rate}</p>
+                    <p><strong>Nights Needed to Break Even:</strong> ${data.nights_to_break_even}</p>
+                    <p><strong>Nights Needed for 20% Profit:</strong> ${data.nights_for_20_profit}</p>
+                `;
+            })
+            .catch(error => console.error("Error:", error));
+        });
+    </script>
+
+</body>
+</html>

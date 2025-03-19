@@ -1,65 +1,49 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, request, jsonify, render_template
 
 app = Flask(__name__)
 
-@app.route('/')
+@app.route("/")
 def home():
-    return render_template('index.html')
+    return render_template("index.html")
 
-@app.route('/calculate', methods=['POST'])
+@app.route("/calculate", methods=["POST"])
 def calculate():
-    data = request.get_json()
+    try:
+        purchase_amount = float(request.form.get("purchaseAmount", 0))
+        furnishing_cost = float(request.form.get("furnishingCost", 0))
+        levies_rates = float(request.form.get("leviesRates", 0))
+        internet_cost = float(request.form.get("internetCost", 0))
+        electricity_cost = float(request.form.get("electricityCost", 0))
+        other_fees = float(request.form.get("otherFees", 0))
+        cleaning_fees = float(request.form.get("cleaningFees", 0))
+        consumables = float(request.form.get("consumables", 0))
+        occupancy_rate = int(request.form.get("occupancyRate", 0))
 
-    # Extract inputs
-    purchase_amount = float(data.get("purchaseAmount", 0))
-    furnishing_cost = float(data.get("furnishingCost", 0))
-    levies_rates = float(data.get("leviesRates", 0))
-    internet_cost = float(data.get("internetCost", 0))
-    electricity_cost = float(data.get("electricityCost", 0))
-    other_fees = float(data.get("otherFees", 0))
-    cleaning_fees = float(data.get("cleaningFees", 0))
-    consumables_cost = float(data.get("consumablesCost", 0))
-    occupancy = int(data.get("occupancy", 0))
+        # Monthly Bond Repayment
+        bond_repayment = purchase_amount * 0.00929
 
-    # Bond repayment calculation (0.929% of purchase price)
-    bond_payment = purchase_amount * 0.00929
+        # Total Monthly Costs
+        total_monthly_cost = (bond_repayment + levies_rates + internet_cost +
+                              electricity_cost + other_fees + cleaning_fees + consumables)
 
-    # Total monthly fixed costs
-    total_monthly_costs = (bond_payment + levies_rates + internet_cost + 
-                           electricity_cost + other_fees + cleaning_fees + consumables_cost)
+        # Minimum Nightly Rate Calculation
+        min_nightly_rate = total_monthly_cost / max(occupancy_rate, 1)
 
-    # Minimum and maximum nightly rates
-    min_nightly_rate = 1500
-    max_nightly_rate = 2500
+        # Nights Needed to Break Even
+        nights_to_break_even = round(total_monthly_cost / min_nightly_rate)
 
-    # Commission calculations
-    airbnb_commission = 0.03 + 0.15  # 3% + 15% VAT
-    booking_commission = 0.15  # 15% fee
-    co_host_commission = 0.12  # 12% fee
+        # Nights Needed for 20% Profit Increase
+        profit_margin = 1.2
+        nights_for_20_profit = round((total_monthly_cost * profit_margin) / min_nightly_rate)
 
-    # Airbnb & Booking.com revenue per night (after fees)
-    airbnb_net_rate = min_nightly_rate * (1 - airbnb_commission - co_host_commission)
-    booking_net_rate = min_nightly_rate * (1 - booking_commission - co_host_commission)
+        return jsonify({
+            "min_rate": round(min_nightly_rate, 2),
+            "nights_to_break_even": nights_to_break_even,
+            "nights_for_20_profit": nights_for_20_profit
+        })
 
-    # Calculate break-even nights
-    airbnb_break_even_nights = round(total_monthly_costs / airbnb_net_rate, 1)
-    booking_break_even_nights = round(total_monthly_costs / booking_net_rate, 1)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
 
-    # Calculate profit nights (20% increments)
-    airbnb_profit_nights = [round((total_monthly_costs * (1 + i)) / airbnb_net_rate, 1) for i in [0.2, 0.4, 0.6, 0.8, 1]]
-    booking_profit_nights = [round((total_monthly_costs * (1 + i)) / booking_net_rate, 1) for i in [0.2, 0.4, 0.6, 0.8, 1]]
-
-    return jsonify({
-        "bondPayment": round(bond_payment, 2),
-        "breakEvenNights": {
-            "airbnb": airbnb_break_even_nights,
-            "booking": booking_break_even_nights
-        },
-        "profitNights": {
-            "airbnb": airbnb_profit_nights,
-            "booking": booking_profit_nights
-        }
-    })
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(debug=True)

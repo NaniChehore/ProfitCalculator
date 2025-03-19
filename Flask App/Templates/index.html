@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Airbnb Pricing Calculator</title>
+</head>
+<body>
+    <h1>Calculate Your Minimum Nightly Rate</h1>
+    <form method="POST">
+        <label>Fixed Costs (comma separated):</label>
+        <input type="text" name="fixed_costs"><br><br>
+        
+        <label>Variable Costs (comma separated):</label>
+        <input type="text" name="variable_costs"><br><br>
+        
+        <label>Expected Occupancy Rate (%):</label>
+        <input type="text" name="occupancy_rate"><br><br>
+        
+        <label>Desired Profit Margin (%):</label>
+        <input type="text" name="profit_margin"><br><br>
+        
+        <button type="submit">Calculate</button>
+    </form>
+    
+    {% if airbnb_price %}
+        <h2>Results:</h2>
+        <p>Airbnb Minimum Rate: R{{ airbnb_price|round(2) }}</p>
+        <p>Booking.com Minimum Rate: R{{ booking_price|round(2) }}</p>
+        <p>Combined Minimum Rate: R{{ combined_price|round(2) }}</p>
+    {% endif %}
+</body>
+</html>

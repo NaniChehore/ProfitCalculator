@@ -9,4 +9,75 @@
 <body class="bg-gray-100">
     <div class="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-10">
         <h1 class="text-2xl font-bold text-center text-blue-600">Airbnb & Booking Profit Calculator</h1>
-        <p class="text-gray
+        <p class="text-gray-600 text-center mt-2">Calculate your minimum nightly rate for profitability.</p>
+
+        <form id="profit-form" class="mt-6">
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-gray-700">Purchase Amount (ZAR):</label>
+                    <input type="number" id="purchaseAmount" class="w-full p-2 border rounded" required>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700">Furnishing Costs (ZAR):</label>
+                    <input type="number" id="furnishingCost" class="w-full p-2 border rounded">
+                </div>
+
+                <div>
+                    <label class="block text-gray-700">Levies & Rates (ZAR):</label>
+                    <input type="number" id="leviesRates" class="w-full p-2 border rounded" required>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700">Internet Cost (ZAR):</label>
+                    <input type="number" id="internetCost" class="w-full p-2 border rounded" required>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700">Electricity Cost (ZAR):</label>
+                    <input type="number" id="electricityCost" class="w-full p-2 border rounded" required>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700">Other Fees (ZAR):</label>
+                    <input type="number" id="otherFees" class="w-full p-2 border rounded">
+                </div>
+
+                <div>
+                    <label class="block text-gray-700">Cleaning Fees (ZAR):</label>
+                    <input type="number" id="cleaningFees" class="w-full p-2 border rounded" required>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700">Consumables Cost (ZAR):</label>
+                    <input type="number" id="consumablesCost" class="w-full p-2 border rounded">
+                </div>
+
+                <div>
+                    <label class="block text-gray-700">Average Occupancy (Days per Month):</label>
+                    <input type="number" id="occupancy" class="w-full p-2 border rounded" required>
+                </div>
+            </div>
+
+            <button type="button" onclick="calculateProfit()"
+                class="w-full mt-6 bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
+                Calculate
+            </button>
+        </form>
+
+        <div id="results" class="mt-6 hidden p-4 bg-green-100 rounded">
+            <h2 class="text-xl font-semibold text-green-700">Results</h2>
+            <p id="bondPayment" class="text-gray-700 mt-2"></p>
+            <p id="minNightsBreakEven" class="text-gray-700 mt-1"></p>
+            <p id="minNightsProfit" class="text-gray-700 mt-1"></p>
+        </div>
+    </div>
+
+    <script>
+        function calculateProfit() {
+            let purchaseAmount = parseFloat(document.getElementById("purchaseAmount").value) || 0;
+            let furnishingCost = parseFloat(document.getElementById("furnishingCost").value) || 0;
+            let leviesRates = parseFloat(document.getElementById("leviesRates").value) || 0;
+            let internetCost = parseFloat(document.getElementById("internetCost").value) || 0;
+            let electricityCost = parseFloat(document.getElementById("electricityCost").value) || 0;
+            let otherFees = parseFloat(document.getElementById("otherFees").value)

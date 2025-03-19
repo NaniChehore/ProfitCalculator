@@ -81,3 +81,18 @@
             let internetCost = parseFloat(document.getElementById("internetCost").value) || 0;
             let electricityCost = parseFloat(document.getElementById("electricityCost").value) || 0;
             let otherFees = parseFloat(document.getElementById("otherFees").value)
+<script>
+document.getElementById("calculateBtn").addEventListener("click", function() {
+    let formData = new FormData(document.getElementById("calculationForm"));
+
+    fetch("/calculate", {
+        method: "POST",
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById("result").innerHTML = "Minimum nightly rate: R" + data.min_rate;
+    })
+    .catch(error => console.error("Error:", error));
+});
+</script>

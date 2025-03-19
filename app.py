@@ -2,29 +2,43 @@ from flask import Flask, render_template, request
 
 app = Flask(__name__)
 
-@app.route("/", methods=["GET", "POST"])
+def calculate_min_nightly_rate(data):
+    purchase_amount = float(data['purchase_amount'])
+    furnishing_costs = float(data.get('furnishing_costs', 0))
+    bond_repayment = purchase_amount * 0.00929
+    levies_rates = float(data['levies_rates'])
+    internet_cost = float(data['internet_cost'])
+    electricity_cost = float(data['electricity_cost'])
+    other_fees = float(data['other_fees'])
+    cleaning_fees = float(data['cleaning_fees'])
+    consumables = float(data['consumables'])
+    occupancy_rate = int(data['occupancy_rate'])
+    
+    total_monthly_costs = (bond_repayment + levies_rates + internet_cost +
+                           electricity_cost + other_fees + cleaning_fees + consumables)
+    
+    airbnb_commission = 0.03 * 1.15  # 3% + VAT
+    booking_com_commission = 0.15
+    co_host_commission = 0.12
+    
+    min_nightly_rate_airbnb = total_monthly_costs / (occupancy_rate * (1 - airbnb_commission - co_host_commission))
+    min_nightly_rate_booking = total_monthly_costs / (occupancy_rate * (1 - booking_com_commission - co_host_commission))
+    
+    profit_levels = []
+    for i in range(0, 101, 20):
+        profit = total_monthly_costs * (1 + i / 100)
+        nights_needed_airbnb = profit / min_nightly_rate_airbnb
+        nights_needed_booking = profit / min_nightly_rate_booking
+        profit_levels.append((i, round(nights_needed_airbnb, 2), round(nights_needed_booking, 2)))
+    
+    return round(min_nightly_rate_airbnb, 2), round(min_nightly_rate_booking, 2), profit_levels
+
+@app.route('/', methods=['GET', 'POST'])
 def index():
-    if request.method == "POST":
-        try:
-            fixed_costs = list(map(float, request.form.getlist("fixed_costs")))
-            variable_costs = list(map(float, request.form.getlist("variable_costs")))
-            occupancy_rate = float(request.form["occupancy_rate"]) / 100
-            profit_margin = float(request.form["profit_margin"]) / 100
+    if request.method == 'POST':
+        min_airbnb, min_booking, profit_levels = calculate_min_nightly_rate(request.form)
+        return render_template('index.html', min_airbnb=min_airbnb, min_booking=min_booking, profit_levels=profit_levels)
+    return render_template('index.html')
 
-            total_fixed = sum(fixed_costs)
-            total_variable = sum(variable_costs)
-            break_even = total_fixed / occupancy_rate + total_variable
-
-            airbnb_rate = break_even / (1 - 0.03)
-            booking_rate = break_even / (1 - 0.15)
-            combined_rate = break_even / (1 - ((0.03 + 0.15) / 2))
-
-            return render_template("index.html", airbnb_price=airbnb_rate,
-                                   booking_price=booking_rate, combined_price=combined_rate)
-        except:
-            return "Error: Please enter valid numbers."
-
-    return render_template("index.html", airbnb_price=None, booking_price=None, combined_price=None)
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run(debug=True)
